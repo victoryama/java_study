@@ -1,0 +1,89 @@
+package application;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Scanner;
+
+import entities.Product;
+
+public class Program {
+
+	public static void main(String[] args) throws FileNotFoundException, IOException {
+		
+		
+		Locale.setDefault(Locale.US);
+		Scanner sc = new Scanner(System.in);
+		
+		List<Product> list = new ArrayList<>();
+		
+		String sourcePath = "C:\\\\Users\\\\victo\\\\OneDrive\\\\Documentos\\\\desenvolvimento\\\\ws-java\\\\section17_exercise7";
+		String sourceFileStr = sourcePath + "\\input.csv";
+		System.out.println("File path: " + sourceFileStr);
+		String targetPath = sourcePath + "\\out";
+		
+		boolean success = new File(targetPath).mkdir(); //cria uma subpasta
+		System.out.println("Directory created successfully: " + success);
+		
+		String targetFileStr = targetPath + "\\summary.csv";
+		
+		//ler o input
+		try (BufferedReader br = new BufferedReader(new FileReader(sourceFileStr))){
+			
+			String itemCsv = br.readLine();
+			while (itemCsv!= null) {
+
+				String[] fields = itemCsv.split(",");
+				String name = fields[0];
+				double price = Double.parseDouble(fields[1]);
+				int quantity = Integer.parseInt(fields[2]);
+				
+				list.add(new Product(name, price, quantity));
+				
+				itemCsv = br.readLine();
+				
+			}
+			
+			//criar o arquivo
+			try (BufferedWriter bw = new BufferedWriter(new FileWriter(targetFileStr, true))){
+				
+				for (Product item : list) {
+					bw.write(item.getName() + "," + String.format("%.2f", item.total()));
+					bw.newLine();
+				}
+				boolean fileCreated = false; 
+				if (list != null) {
+					fileCreated = true;
+				}
+				System.out.println("File created successfully: " + fileCreated);		
+		} catch (IOException e) {
+				System.out.println("Error: " + e.getMessage());
+			}
+			
+		}catch (IOException e){
+			System.out.println("Error: " + e.getMessage());			
+		}
+		
+		
+		//ler o output
+		try (BufferedReader br = new BufferedReader(new FileReader(targetFileStr))){
+			
+			String line = br.readLine();
+			while (line != null) {
+				System.out.println(line);
+				line = br.readLine();
+			}
+		} catch (IOException e) {
+			System.out.println("Error reading file: " + e.getMessage());
+		}
+		
+	}
+}
+
